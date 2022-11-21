@@ -2,4 +2,9 @@
 Python Project for Object Oriented Programming  
 Project Info: https://utah.instructure.com/courses/821474/pages/project-covid-dashboard
 
+Team Members:
+Freddie Rice
+
+
+
 A Covid-19 dashboard
