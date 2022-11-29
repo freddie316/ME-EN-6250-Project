@@ -4,7 +4,7 @@ Project Info: https://utah.instructure.com/courses/821474/pages/project-covid-da
 
 Team Members:  
 Freddie Rice
-
+Tanner Short  
 
 
 A Covid-19 dashboard
