@@ -3,7 +3,8 @@ Python Project for Object Oriented Programming
 Project Info: https://utah.instructure.com/courses/821474/pages/project-covid-dashboard
 
 Team Members:  
-Freddie Rice
+Freddie Rice  
+Tanner Short  
 Brandon Baum
 
 
