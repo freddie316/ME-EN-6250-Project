@@ -9,6 +9,8 @@
 # I'd recommend using conda instead of pip 
 # if you are using anaconda distribution 
 
+# ScrapeWebsiteV1.1.0
+
 import os
 import requests
 import pandas as pd
