@@ -9,41 +9,67 @@
 # I'd recommend using conda instead of pip 
 # if you are using anaconda distribution 
 
+# ScrapeWebsiteV1.1.0
+
+import os
 import requests
 import pandas as pd
 from bs4 import BeautifulSoup
-
+from pathlib import Path
 
 def scrape_country(country,site):
     # Country is the string of the country being queried. URL is the string of the site being scraped. MUST be worldometer OR XXXX
     
-    if site.lower() == 'worldometer':
-        URL = "https://www.worldometers.info/coronavirus/#main_table"
-        page = requests.get(URL)
-        soup = BeautifulSoup(page.content, "html.parser")
-        
-        table = soup.find('table', id = 'main_table_countries_today')
-        data = {'Country':[], 'Total Deaths':[],
-                'New Deaths':[], 'Deaths/1M pop':[],
-                'New Deaths/1M pop':[]}
-        for row in table.tbody.find_all('tr'):
-            # Find all data for each column
-            columns = row.find_all('td')
-            if columns != [] and columns[1].text.strip() != '':
-                data['Country'].append(columns[1].text.strip())
-                data['Total Deaths'].append(columns[4].text.strip())
-                data['New Deaths'].append(columns[5].text.strip())
-                data['Deaths/1M pop'].append(columns[11].text.strip())
-                data['New Deaths/1M pop'].append(columns[20].text.strip())
-        df = pd.DataFrame.from_dict(data)
+    # Set up data dictionary
+    data = {country:[], 'Total Deaths':[],
+            'New Deaths':[], 'Deaths/1M pop':[],
+            'New Deaths/1M pop':[]}
     
-        # Input country names below to get info about that country
-        return df[df['Country']==country]
+    if site.lower() == 'worldometer': # site input specifies worldometer
+        URL = "https://www.worldometers.info/coronavirus/#main_table"
+        page = requests.get(URL) # pull HTML from worldometer
+        soup = BeautifulSoup(page.content, "html.parser") # parse HTML with soup
+        
+        # Scrape the table for the relevant data
+        for day in ['today','yesterday','yesterday2']: # loop thru availabe days
+            tableId = 'main_table_countries_' + day
+            table = soup.find('table', id = tableId) # search the correct table
+            if day != 'yesterday2':
+                data[country].append(day.capitalize()) # append days to dict
+            else:
+                data[country].append("Two Days Ago")
+            for row in table.tbody.find_all('tr'): # find all rows
+                # Find all data for each column
+                columns = row.find_all('td') # find all data entries
+                if columns != [] and columns[1].text.strip() == country:
+                    # look for only relevant country, and append data to dict
+                    data['Total Deaths'].append(columns[4].text.strip())
+                    data['New Deaths'].append(columns[5].text.strip())
+                    data['Deaths/1M pop'].append(columns[11].text.strip())
+                    data['New Deaths/1M pop'].append(columns[20].text.strip())
+
+        # Convert dictionary into a dataframe
+        df = pd.DataFrame.from_dict(data)
+        df.style.set_caption(country)
+        
+        # Export dataframe to JSON
+        output = Path(os.getcwd())
+        output = output.parent.absolute()
+        filename = country + '.json'
+        output = os.path.join(output, 'output\\' + filename)
+        df.to_json(output)
+    
+        # Return the dataframe
+        return df
     elif site.lower() == '':
         URL = ""
         # WIll be different method for second site we choose
     else:
         return None
     
-countryData = scrape_country('USA','WorldOMeter')
-print(countryData)
+USAData = scrape_country('USA','WorldOMeter')
+print(USAData)
+UKData = scrape_country('UK','WorldOMeter')
+print(UKData)
+ChinaData = scrape_country('China','WorldOMeter')
+print(ChinaData)
