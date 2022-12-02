@@ -61,9 +61,15 @@ def scrape_country(country,site):
     
         # Return the dataframe
         return df
-    elif site.lower() == '':
-        URL = ""
+    elif site.lower() == 'world health organization' or site.lower() == 'who':
+        URL = "https://covid19.who.int/table"
         # WIll be different method for second site we choose
+        page = requests.get(URL) # pull html from World Health Organization
+        soup = BeautifulSoup(page.content, "html.parser") # parse HTML
+        
+        # Scrape table for relevant data 
+        
+        
     else:
         return None
     
