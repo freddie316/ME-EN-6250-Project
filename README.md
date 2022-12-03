@@ -28,3 +28,11 @@ Library Dependencies:
 5. Bokeh
 	- pip: python -m pip install bokeh
 	- conda: conda install bokeh
+6. Selenium
+	- pip: python -m pip install selenium
+	- conda: conda install selenium
+7. Webdriver Manager
+	- pip: python -m pip install webdriver-manager
+	- conda: conda install webdriver-manager
+	
+### 
