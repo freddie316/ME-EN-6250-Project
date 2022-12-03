@@ -168,13 +168,13 @@ def scrape_country(country,site):
     else:
         return None
     
-USAData = scrape_country('USA','WorldOMeter')
-print(USAData)
 # =============================================================================
+# USAData = scrape_country('USA','WorldOMeter')
+# print(USAData)
 # UKData = scrape_country('UK','WorldOMeter')
 # print(UKData)
 # ChinaData = scrape_country('China','WorldOMeter')
 # print(ChinaData)
+# USADataWHO = scrape_country('United States of America','WHO')
+# print(USADataWHO)
 # =============================================================================
-USADataWHO = scrape_country('United States of America','WHO')
-print(USADataWHO)
