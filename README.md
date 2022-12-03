@@ -33,6 +33,6 @@ Library Dependencies:
 	- conda: conda install selenium
 7. Webdriver Manager
 	- pip: python -m pip install webdriver-manager
-	- conda: conda install webdriver-manager
+	- conda: Unavailable through conda as of writing. Use pip method. 
 	
 ### 
