@@ -11,16 +11,28 @@ class MyException(Exception):
 
 
 def get_user_input(n=5):
-    country = input("Input a country to search for:\t")
-    site = input("Choose a website to search on: WorldOMeter, WHO:\t")
-    if site.lower() == 'worldometer' or site.lower() == 'who' or site.lower() == 'world health organization':
-        return country, site
-    elif n > 1:
-        print("Invalid Website Selection, valid selections are 'WorldOMeter', 'WHO', or 'World Health Organization'")
-        print(f"{n-1} attempts remaining")
-        return get_user_input(n - 1)
-    else:
-        raise MyException('Maximum attempts reached!')
+    with open('country-list.txt') as country_list:
+        data = country_list.read()
+        valid_countries = data.split('\n')
+        print(valid_countries)
+
+    while n>0:
+        country = input("Input a country to search for:\t")
+        if country not in valid_countries:
+            print("Invalid Country Selection")
+            n-=1
+            print(f"{n} attempts remaining")
+            continue
+        site = input("Choose a website to search on: WorldOMeter, WHO:\t")
+        if site.lower() == 'worldometer' or site.lower() == 'who' or site.lower() == 'world health organization':
+            return country, site
+        else:
+            print("Invalid Website Selection, valid selections are 'WorldOMeter', 'WHO', or 'World Health Organization'")
+            n-=1
+            print(f"{n} attempts remaining")
+            continue
+    valid_countries.close()
+    raise MyException('Maximum attempts reached!')
 
 
 cont = 1
