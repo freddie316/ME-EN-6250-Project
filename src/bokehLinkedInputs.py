@@ -44,6 +44,9 @@ var end = daterange.data['end_date']
 var f = cb_obj.value
 sc.data['Date'] = []
 sc.data['Deaths'] = []
+sc.data['Deaths per mill'] = []
+sc.data['Death Rate'] = []
+sc.data['Death Rate per mill'] = []
 sc.data['Country'] = []
 
 //Goes through the Overall datasource and adds to the Current datasource based on country and date selection
@@ -51,9 +54,10 @@ for(var i = 0; i <= source.get_length(); i++){
     if (source.data['Country'][i] == f && source.data['Date'][i]<=end && source.data['Date'][i]>=start){
         sc.data['Date'].push(source.data['Date'][i]);
         sc.data['Deaths'].push(source.data['Deaths'][i]);
+        sc.data['Deaths per mill'].push(source.data['Deaths per mill'][i]);
+        sc.data['Death Rate'].push(source.data['Death Rate'][i]);
+        sc.data['Death Rate per mill'].push(source.data['Death Rate per mill'][i]);
         sc.data['Country'].push(source.data['Country'][i]);
-        //alert(source.data['Deaths'][i])
-        //alert(sc.data['Deaths'][i])
     }
 }
 
@@ -74,12 +78,17 @@ var country = sc.data['Country'][0]
 
 sc.data['Date'] = []
 sc.data['Deaths'] = []
-
+sc.data['Deaths per mill'] = []
+sc.data['Death Rate'] = []
+sc.data['Death Rate per mill'] = []
 
 for(var i = 0; i <= source.get_length(); i++){
     if (source.data['Country'][i] == country && source.data['Date'][i]<=end && source.data['Date'][i]>=start){
         sc.data['Date'].push(source.data['Date'][i]);
         sc.data['Deaths'].push(source.data['Deaths'][i]);
+        sc.data['Deaths per mill'].push(source.data['Deaths per mill'][i]);
+        sc.data['Death Rate'].push(source.data['Death Rate'][i]);
+        sc.data['Death Rate per mill'].push(source.data['Death Rate per mill'][i]);
     }
 }
 
@@ -96,13 +105,18 @@ update_dropdown = CustomJS(args = dict(source=Overall, sc=Current, daterange = d
 update_date = CustomJS(args = dict(source=Overall, sc=Current, daterange = daterange), code = date_code)
 
 dropdown = Select(options = ['USA','India'], title = 'Choose Country', value = 'USA') #Initializes the dropdown with USA selected
-dateslider = DateRangeSlider(title = 'Time Range', start = date(2022,12,7), end = date(2022,12,9), value =(date(2022,12,7),date(2022,12,9)), step=86400000) #Initializes the date slider
+dateslider = DateRangeSlider(title = 'Time Range', start = date(2022,12,7), end = date(2022,12,9), value =(date(2022,12,7),date(2022,12,9)), step=1) #Initializes the date slider
 
 dropdown.js_on_change('value',update_dropdown) #Passes the dropdown value into the update_dropdown function handle
 dateslider.js_on_change('value',update_date)
 
-p = figure(x_axis_label = 'Date', y_axis_label = 'Deaths',x_axis_type='datetime') #Initialize the figure
-p.line(x='Date',y='Deaths',source=Current) #source=Current links the plot to the Current datasource. Any changes done to "Current" will be automatically graphed.
-
+p = figure(x_axis_label = 'Date', y_axis_label = 'Count',x_axis_type='datetime',) #Initialize the figure
+p.line(x='Date',y='Deaths',source=Current, legend_label="Deaths",line_color="blue") #source=Current links the plot to the Current datasource. Any changes done to "Current" will be automatically graphed.
+p.line(x='Date',y='Death Rate',source=Current, legend_label="Death Rate",line_color="red")
+p.line(x='Date',y='Deaths per mill',source=Current, legend_label="Deaths per mill",line_color="orange")
+p.line(x='Date',y='Death Rate per mill',source=Current, legend_label="Death Rate per mill",line_color="purple")
+p.legend.location = "top_left"
+p.legend.click_policy="hide"
+#p.multi_line(xs = 'Date', ys = 'Deaths', source = Current)
 show(column(dropdown,dateslider,p)) #Creates the bokeh image
 
