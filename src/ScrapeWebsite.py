@@ -9,7 +9,7 @@
 # I'd recommend using conda instead of pip 
 # if you are using anaconda distribution 
 
-# ScrapeWebsiteV2.2.0
+# ScrapeWebsiteV2.3.0
 
 import os
 import requests
@@ -25,7 +25,7 @@ def scrape_country(country,site):
     # Country is the string of the country being queried. URL is the string of the site being scraped. MUST be worldometer OR XXXX
     
     # Set up data dictionary
-    data = {country:[], 'Total Deaths':[],
+    data = {'Country':[], 'Date':[], 'Total Deaths':[],
             'New Deaths':[], 'Deaths/1M pop':[],
             'New Deaths/1M pop':[]}
     
@@ -40,18 +40,19 @@ def scrape_country(country,site):
             table = soup.find('table', id = tableId) # search the correct table
             if day == 'today':
                 today = date.today().strftime("%m/%d/%y")
-                data[country].append(today) # append days to dict
+                data['Date'].append(today) # append days to dict
             elif day == 'yesterday':
                 yesterday = date.today() - timedelta(days = 1)
-                data[country].append(yesterday.strftime("%m/%d/%y"))
+                data['Date'].append(yesterday.strftime("%m/%d/%y"))
             else:
                 yesterday2 = date.today() - timedelta(days = 2)
-                data[country].append(yesterday2.strftime("%m/%d/%y"))
+                data['Date'].append(yesterday2.strftime("%m/%d/%y"))
             for row in table.tbody.find_all('tr'): # find all rows
                 # Find all data for each column
                 columns = row.find_all('td') # find all data entries
                 if columns != [] and columns[1].text.strip() == country:
                     # look for only relevant country, and append data to dict
+                    data['Country'].append(columns[1].text.strip())
                     data['Total Deaths'].append(columns[4].text.strip())
                     data['New Deaths'].append(columns[5].text.strip())
                     data['Deaths/1M pop'].append(columns[11].text.strip())
@@ -137,10 +138,11 @@ def scrape_country(country,site):
         table = soup.find('div', role = 'rowgroup')
         rows = table.find_all('div', role = 'row')
         today = date.today().strftime("%m/%d/%y")
-        data[country].append(today) # append days to dict
+        data['Date'].append(today) # append days to dict
         for row in rows:
             cells = row.find_all('div',role = 'cell')
             if cells[0].text.strip() != [] and cells[0].text.strip() == country:
+                data['Country'].append(cells[0].text.strip())
                 data['Total Deaths'].append(cells[1].text.strip())
                 data['New Deaths'].append(cells[3].text.strip())
                 data['Deaths/1M pop'].append(float(cells[2].text.strip())*10)
