@@ -52,18 +52,20 @@ countries = []
 for i in continents.keys():
     for j in continents[i]:
         countries.append(j)
-
+print("Scraping latest data from the web...")
 populate_dataframes(continents)
 # note, IDE marks variables created inside the function as undefined
 # yet, the variables WILL be defined once the function runs.
 df_overall = dfMaster
 df_overall['Date'] = pd.to_datetime(df_overall['Date'])
 df_overall = df_overall.sort_values(['Country','Date'], ascending=[True, True]) #Sorts the dataframe.
-
+df_today = df_overall[df_overall['Date']==df_overall['Date'].max()]
+df_today = df_today.sort_values(['Deaths/1M pop'],ascending=[True])
 df_current = df_overall[df_overall['Country'] =='USA'] #Pulls out a column showing just the USA (default country plot)
 
 Overall = ColumnDataSource(df_overall) #Puts the dataframe for all of the countries into a datasource useable by Javascript
 Current = ColumnDataSource(df_current) #Another DataSource that will be used for plotting
+Today = ColumnDataSource(df_today)
 
 continent_dfs = [dfNAmerica, dfAsia, dfSAmerica, dfAfrica, dfOceania, dfEurope]
 
@@ -99,10 +101,9 @@ zoomed_table = DataTable(source=current_continent, columns = columns)
 
 
 # TODO - The plot is used in every section, change so each display has its own figures
-plot = figure(title = "Big Picture Deaths per Million People Today", x_axis_label='Country', y_axis_label='Count', x_range = df_overall[df_overall['Country']==df_overall['Country'].max()]['Deaths/1M pop'])
-x = countries
-y = df_overall[df_overall['Date']==df_overall['Date'].max()]['Deaths/1M pop']
-plot.vbar(x,y)
+plot = figure(title = "Big Picture - Deaths per Million People Today", x_axis_label='Country', y_axis_label='Deaths/1M pop',x_range=df_today['Country'])
+plot.vbar(x='Country',top='Deaths/1M pop',source=Today)
+plot.xaxis.major_label_orientation = 1
 # TODO - create the big display plot
 display_big = plot
 
@@ -117,7 +118,6 @@ zoomed_continents = Select(title = "Continent Select", options = valid_continent
 
 continent_code = """
 var continent = cb_obj.value
-alert(continent);
 switch(continent) {
     case 'Africa':
         curr.data = Africa.data;
