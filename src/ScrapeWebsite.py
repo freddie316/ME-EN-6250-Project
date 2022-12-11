@@ -19,7 +19,7 @@ from bs4 import BeautifulSoup
 from pathlib import Path
 from selenium import webdriver
 from webdriver_manager.chrome import ChromeDriverManager
-from datetime import date, timedelta,datetime
+from datetime import date, timedelta
 
 def scrape_country(country,site):
     # Country is the string of the country being queried. URL is the string of the site being scraped. MUST be worldometer OR XXXX
@@ -171,8 +171,8 @@ def scrape_country(country,site):
         return None
     
 # =============================================================================
-USAData = scrape_country('USA','WorldOMeter')
-print(USAData)
+# USAData = scrape_country('USA','WorldOMeter')
+# print(USAData)
 # UKData = scrape_country('UK','WorldOMeter')
 # print(UKData)
 # ChinaData = scrape_country('China','WorldOMeter')
