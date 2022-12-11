@@ -179,8 +179,8 @@ def scrape_country(country,site):
         return None
     
 # =============================================================================
-USAData = scrape_country('USA','WorldOMeter')
-print(USAData)
+# USAData = scrape_country('USA','WorldOMeter')
+# print(USAData)
 # UKData = scrape_country('UK','WorldOMeter')
 # print(UKData)
 # ChinaData = scrape_country('China','WorldOMeter')
