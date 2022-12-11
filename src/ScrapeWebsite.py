@@ -71,9 +71,11 @@ def scrape_country(country,site):
             dfPrev = pd.read_json(output,convert_dates=False) # check if JSON already exists
             for i in reversed(range(0,len(df))):
                 dataAlready = False
-                for j in dfPrev['Date']:
-                    if df['Date'][i] == j:
+                for j in range(0,len(df)):
+                    if df['Date'][i] == dfPrev['Date'][j]:
                         dataAlready = True
+                        for key in dfPrev:
+                            dfPrev[key][j] = df[key][i]
                 if dataAlready == False:
                     dfPrev = pd.concat([df.loc[i].to_frame().T,dfPrev],ignore_index=True)
             dfPrev.to_json(output)
@@ -171,8 +173,8 @@ def scrape_country(country,site):
         return None
     
 # =============================================================================
-# USAData = scrape_country('USA','WorldOMeter')
-# print(USAData)
+USAData = scrape_country('USA','WorldOMeter')
+print(USAData)
 # UKData = scrape_country('UK','WorldOMeter')
 # print(UKData)
 # ChinaData = scrape_country('China','WorldOMeter')
