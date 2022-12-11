@@ -14,7 +14,7 @@ from datetime import date, datetime
 from pathlib import Path
 from ScrapeWebsite import scrape_country
 from bokeh.layouts import column, row, gridplot
-from bokeh.models import CustomJS, Dropdown, AutocompleteInput, DateRangeSlider, CheckboxGroup, ColumnDataSource, Select
+from bokeh.models import CustomJS, Dropdown, AutocompleteInput, DateRangeSlider, CheckboxGroup, ColumnDataSource, Select, DataTable, TableColumn
 from bokeh.plotting import figure, output_file, show
 
 outputPath = Path(os.getcwd())
@@ -65,13 +65,37 @@ df_current = df_overall[df_overall['Country']=='USA'] #Pulls out a column showin
 Overall = ColumnDataSource(df_overall) #Puts the dataframe for all of the countries into a datasource useable by Javascript
 Current = ColumnDataSource(df_current) #Another DataSource that will be used for plotting
 
-NAmerica = ColumnDataSource(dfNAmerica)
-Asia = ColumnDataSource(dfAsia)
-SAmerica = ColumnDataSource(dfSAmerica)
-Africa = ColumnDataSource(dfAfrica)
-Oceania = ColumnDataSource(dfOceania)
+continent_dfs = [dfNAmerica, dfAsia, dfSAmerica, dfAfrica, dfOceania, dfEurope]
 
-zoom_fig = figure(title = 'Stats by Continent', )
+for i in range(0,len(continent_dfs)):
+    current_date = continent_dfs[i]['Date'].max()
+    continent_dfs[i] = continent_dfs[i][continent_dfs[i]['Date']==current_date]
+    #continent = continent[continent['Date']==current_date]
+
+
+NAmerica = ColumnDataSource(continent_dfs[0])
+Asia = ColumnDataSource(continent_dfs[1])
+SAmerica = ColumnDataSource(continent_dfs[2])
+Africa = ColumnDataSource(continent_dfs[3])
+Oceania = ColumnDataSource(continent_dfs[4])
+Europe = ColumnDataSource(continent_dfs[5])
+
+current_continent = ColumnDataSource(continent_dfs[0])
+
+columns = [
+    TableColumn(field='Country', title='Country'),
+    TableColumn(field='Date', title='Date'),
+    TableColumn(field='Total Deaths', title='Total Deaths'),
+    TableColumn(field='New Deaths', title='New Deaths'),
+    TableColumn(field='Deaths/1M pop', title='Deaths/1M pop'),
+    TableColumn(field='New Deaths/1M pop', title='New Deaths/1M pop')
+    ]
+
+
+zoomed_table = DataTable(source=current_continent, columns = columns)
+
+
+#zoom_fig = figure(title = 'Stats by Continent', )
 
 
 # TODO - The plot is used in every section, change so each display has its own figures
@@ -89,7 +113,41 @@ with open('continent-list.txt') as continent_list:
 
 # TODO - add functionality to Dropdown menu to update plots
 zoomed_continents = Dropdown(label = "Continent Select", menu = valid_continents)
-display_zoomed = column(zoomed_continents, plot)
+
+
+continent_code = """
+var continent = cb_obj.value
+alert(continent)
+switch(continent) {
+    case 'Africa':
+        curr.data = Africa.data
+        break;
+    case 'Asia':
+        curr.data = NAmerica.data
+        break;
+    case 'Europe':
+        curr.data = Europe.data
+        break;
+    case 'North America':
+        curr.data = NAmerica.data
+        break;
+    case 'South America':
+        curr.data = SAmerica.data
+        break;
+    case 'Oceania':
+        curr.data = Oceania.data
+        break;
+    default:
+        curr.data = curr.data  
+}
+
+curr.change.emit();
+"""
+
+continent_select = CustomJS(args = dict(curr=current_continent, NAmerica=NAmerica, Asia = Asia,SAmerica=SAmerica,Africa=Africa,Oceania=Oceania), code = continent_code)
+#zoomed_continents.js_on_change('value', continent_select)
+
+display_zoomed = column(zoomed_continents, zoomed_table)
 
 # TODO - change to unique country-list.txt file with just the countries we scraped
 with open('country-list-WOM.txt') as country_list:

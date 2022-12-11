@@ -5,8 +5,11 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="034bf8d5-bf4a-47be-b14b-a34d0f763d81" name="Changes" comment="">
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/output/India-WOM.json" beforeDir="false" afterPath="$PROJECT_DIR$/output/India-WOM.json" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/output/covid-dashboard.html" beforeDir="false" afterPath="$PROJECT_DIR$/output/covid-dashboard.html" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/bokehDashboard.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/bokehDashboard.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/continent-list.txt" beforeDir="false" afterPath="$PROJECT_DIR$/src/continent-list.txt" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
