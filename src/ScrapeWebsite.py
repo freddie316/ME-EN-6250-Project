@@ -9,7 +9,7 @@
 # I'd recommend using conda instead of pip 
 # if you are using anaconda distribution 
 
-# ScrapeWebsiteV2.4.0
+# ScrapeWebsiteV2.4.1
 
 import os
 import requests
@@ -75,20 +75,23 @@ def scrape_country(country,site):
         
         try:
             dfPrev = pd.read_json(output,convert_dates=False) # check if JSON already exists
+        except Exception as e:
+            print(e)
+            df.to_json(output)
+            return df # Return the dataframe
+        else:
             for i in reversed(range(0,len(df))):
                 dataAlready = False
-                for j in range(0,len(df)):
+                for j in range(0,len(dfPrev)):
                     if df['Date'][i] == dfPrev['Date'][j]:
                         dataAlready = True
                         for key in dfPrev:
-                            dfPrev.loc[:, (key,j)] = df.loc[:,(key,j)]
+                            dfPrev.loc[j, key] = df.loc[i,key]
                 if dataAlready == False:
                     dfPrev = pd.concat([df.loc[i].to_frame().T,dfPrev],ignore_index=True)
             dfPrev.to_json(output)
             return dfPrev # Return the dataframe
-        except:
-            df.to_json(output)
-            return df # Return the dataframe
+        
         
        
 
