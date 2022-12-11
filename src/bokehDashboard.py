@@ -8,13 +8,11 @@
 # from bokeh.models import CustomJS
 #This is for creating layout
 import os
-import numpy as np
 import pandas as pd
-from datetime import date, datetime
 from pathlib import Path
 from ScrapeWebsite import scrape_country
 from bokeh.layouts import column, row, gridplot
-from bokeh.models import CustomJS, Dropdown, AutocompleteInput, DateRangeSlider, CheckboxGroup, ColumnDataSource, Select, DataTable, TableColumn
+from bokeh.models import CustomJS, DateRangeSlider, ColumnDataSource, Select, DataTable, TableColumn
 from bokeh.plotting import figure, output_file, show
 
 outputPath = Path(os.getcwd())
@@ -52,8 +50,12 @@ countries = []
 for i in continents.keys():
     for j in continents[i]:
         countries.append(j)
+        
 print("Scraping latest data from the web...")
 populate_dataframes(continents)
+print("Scraping complete.")
+print("Preparing the webpage...")
+
 # note, IDE marks variables created inside the function as undefined
 # yet, the variables WILL be defined once the function runs.
 df_overall = dfMaster
@@ -255,3 +257,4 @@ display_interactive = column(dropdown,dateslider,p)
 layout = column(row(display_big,display_zoomed),display_interactive)
 #layout = gridplot([[display_big, display_zoomed],[display_interactive, None]])  # creating the layout
 show(layout)  # displaying the layout
+print("Preperations complete, displaying the webpage.")
