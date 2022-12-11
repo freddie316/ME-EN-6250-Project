@@ -10,7 +10,7 @@
 import os
 import numpy as np
 import pandas as pd
-from datetime import date
+from datetime import date, datetime
 from pathlib import Path
 from ScrapeWebsite import scrape_country
 from bokeh.layouts import column, row, gridplot
@@ -105,7 +105,7 @@ sc.data['Date'] = []
 sc.data['Total Deaths'] = []
 sc.data['Deaths/1M pop'] = []
 sc.data['New Deaths'] = []
-sc.data['Death Rate per mill'] = []
+sc.data['New Deaths/1M pop'] = []
 sc.data['Country'] = []
 
 //Goes through the Overall datasource and adds to the Current datasource based on country and date selection
@@ -115,7 +115,7 @@ for(var i = 0; i <= source.get_length(); i++){
         sc.data['Total Deaths'].push(source.data['Total Deaths'][i]);
         sc.data['Deaths/1M pop'].push(source.data['Deaths/1M pop'][i]);
         sc.data['New Deaths'].push(source.data['New Deaths'][i]);
-        sc.data['New Deaths/1M pop'].push(source.data['Death Rate per mill'][i]);
+        sc.data['New Deaths/1M pop'].push(source.data['New Deaths/1M pop'][i]);
         sc.data['Country'].push(source.data['Country'][i]);
     }
 }
@@ -139,7 +139,7 @@ sc.data['Date'] = []
 sc.data['Total Deaths'] = []
 sc.data['Deaths/1M pop'] = []
 sc.data['New Deaths'] = []
-sc.data['Death Rate per mill'] = []
+sc.data['New Deaths/1M pop'] = []
 
 for(var i = 0; i <= source.get_length(); i++){
     if (source.data['Country'][i] == country && source.data['Date'][i]<=end && source.data['Date'][i]>=start){
@@ -147,7 +147,7 @@ for(var i = 0; i <= source.get_length(); i++){
         sc.data['Total Deaths'].push(source.data['Total Deaths'][i]);
         sc.data['Deaths/1M pop'].push(source.data['Deaths/1M pop'][i]);
         sc.data['New Deaths'].push(source.data['New Deaths'][i]);
-        sc.data['Death Rate per mill'].push(source.data['Death Rate per mill'][i]);
+        sc.data['New Deaths/1M pop'].push(source.data['New Deaths/1M pop'][i]);
     }
 }
 
@@ -155,7 +155,7 @@ sc.change.emit();
 """
 # ---- Create a dataframe from the list
 
-valid_dates = {'start_date' : df_overall['Date'][0], 'end_date' : df_overall['Date'][-1]}
+valid_dates = {'start_date' : df_overall['Date'].min(), 'end_date' : df_overall['Date'].max()}
 print(valid_dates)
 valid_dates = pd.DataFrame(valid_dates, index=[0])
 
@@ -164,17 +164,18 @@ daterange = ColumnDataSource(valid_dates) #Date range used for plotting.
 update_dropdown = CustomJS(args = dict(source=Overall, sc=Current, daterange = daterange), code=dropdown_code) #Shows the Javascript code what to run when the dropdown is changed.
 update_date = CustomJS(args = dict(source=Overall, sc=Current, daterange = daterange), code = date_code)
 
+dateFormat = "%m/%d/%y"
 dropdown = Select(options = countries, title = 'Choose Country', value = 'USA') #Initializes the dropdown with USA selected
-dateslider = DateRangeSlider(title = 'Time Range', start = date(2022,12,7), end = date(2022,12,9), value =(date(2022,12,7),date(2022,12,9)), step=1) #Initializes the date slider
+dateslider = DateRangeSlider(title = 'Time Range', start = datetime.strptime(valid_dates['start_date'][0],dateFormat), end = datetime.strptime(valid_dates['end_date'][0],dateFormat), value =(valid_dates['start_date'][0],valid_dates['end_date'][0]), step=1) #Initializes the date slider
 
 dropdown.js_on_change('value',update_dropdown) #Passes the dropdown value into the update_dropdown function handle
 dateslider.js_on_change('value',update_date)
 
 p = figure(x_axis_label = 'Date', y_axis_label = 'Count',x_axis_type='datetime',) #Initialize the figure
-p.line(x='Date',y='Total Deaths',source=Current, legend_label="Deaths",line_color="blue") #source=Current links the plot to the Current datasource. Any changes done to "Current" will be automatically graphed.
-p.line(x='Date',y='New Deaths',source=Current, legend_label="Death Rate",line_color="red")
-p.line(x='Date',y='Deaths/1M pop',source=Current, legend_label="Deaths per mill",line_color="orange")
-p.line(x='Date',y='Death Rate per mill',source=Current, legend_label="Death Rate per mill",line_color="purple")
+p.line(x='Date',y='Total Deaths',source=Current, legend_label="Total Deaths",line_color="blue") #source=Current links the plot to the Current datasource. Any changes done to "Current" will be automatically graphed.
+p.line(x='Date',y='New Deaths',source=Current, legend_label="New Deaths",line_color="red")
+p.line(x='Date',y='Deaths/1M pop',source=Current, legend_label="Deaths/1M pop",line_color="orange")
+p.line(x='Date',y='New Deaths/1M pop',source=Current, legend_label="New Deaths/1M pop",line_color="purple")
 p.legend.location = "top_left"
 p.legend.click_policy="hide"
 #p.multi_line(xs = 'Date', ys = 'Total Deaths', source = Current)
