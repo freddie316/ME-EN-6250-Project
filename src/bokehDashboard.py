@@ -154,7 +154,7 @@ for(var i = 0; i <= source.get_length(); i++){
 sc.change.emit();
 """
 # ---- Create a dataframe from the list
-
+df_overall['Date'] = pd.to_datetime(df_overall['Date'])
 valid_dates = {'start_date' : df_overall['Date'].min(), 'end_date' : df_overall['Date'].max()}
 print(valid_dates)
 valid_dates = pd.DataFrame(valid_dates, index=[0])
@@ -164,9 +164,8 @@ daterange = ColumnDataSource(valid_dates) #Date range used for plotting.
 update_dropdown = CustomJS(args = dict(source=Overall, sc=Current, daterange = daterange), code=dropdown_code) #Shows the Javascript code what to run when the dropdown is changed.
 update_date = CustomJS(args = dict(source=Overall, sc=Current, daterange = daterange), code = date_code)
 
-dateFormat = "%m/%d/%y"
 dropdown = Select(options = countries, title = 'Choose Country', value = 'USA') #Initializes the dropdown with USA selected
-dateslider = DateRangeSlider(title = 'Time Range', start = datetime.strptime(valid_dates['start_date'][0],dateFormat), end = datetime.strptime(valid_dates['end_date'][0],dateFormat), value =(valid_dates['start_date'][0],valid_dates['end_date'][0]), step=1) #Initializes the date slider
+dateslider = DateRangeSlider(title = 'Time Range', start = valid_dates['start_date'][0], end = valid_dates['end_date'][0], value =(valid_dates['start_date'][0],valid_dates['end_date'][0]), step=1) #Initializes the date slider
 
 dropdown.js_on_change('value',update_dropdown) #Passes the dropdown value into the update_dropdown function handle
 dateslider.js_on_change('value',update_date)
