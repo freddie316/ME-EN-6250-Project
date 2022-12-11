@@ -57,7 +57,13 @@ populate_dataframes(continents)
 # note, IDE marks variables created inside the function as undefined
 # yet, the variables WILL be defined once the function runs.
 df_overall = dfMaster
+df_overall['Date'] = pd.to_datetime(df_overall['Date'])
 df_overall = df_overall.sort_values(['Country','Date'], ascending=[True, True]) #Sorts the dataframe.
+
+df_current = df_overall[df_overall['Country']=='USA'] #Pulls out a column showing just the USA (default country plot)
+
+Overall = ColumnDataSource(df_overall) #Puts the dataframe for all of the countries into a datasource useable by Javascript
+Current = ColumnDataSource(df_current) #Another DataSource that will be used for plotting
 
 NAmerica = ColumnDataSource(dfNAmerica)
 Asia = ColumnDataSource(dfAsia)
@@ -93,15 +99,6 @@ with open('country-list-WOM.txt') as country_list:
 # TODO - add JS functions to each of these widgets
 
 # Pasted below is the code from bokehLinkedInputs to create an interactive image with dropdown box and date slider - inputs need to be modified to dataframe from this code
-
-df_overall = dfMaster
-df_overall['Date'] = pd.to_datetime(df_overall['Date'])
-df_overall = df_overall.sort_values(['Country','Date'], ascending=[True, True]) #Sorts the dataframe.
-
-df_current = df_overall[df_overall['Country']=='USA'] #Pulls out a column showing just the USA (default country plot)
-
-Overall = ColumnDataSource(df_overall) #Puts the dataframe for all of the countries into a datasource useable by Javascript
-Current = ColumnDataSource(df_current) #Another DataSource that will be used for plotting
 
 # ---- JavaScript Codes to be used
 alert_code = """
@@ -182,15 +179,18 @@ dateslider = DateRangeSlider(title = 'Time Range', start = valid_dates['start_da
 dropdown.js_on_change('value',update_dropdown) #Passes the dropdown value into the update_dropdown function handle
 dateslider.js_on_change('value',update_date)
 
-p = figure(x_axis_label = 'Date', y_axis_label = 'Count',x_axis_type='datetime',) #Initialize the figure
-#p.line(x='Date',y='Total Deaths',source=Current, legend_label="Total Deaths",line_color="blue") #source=Current links the plot to the Current datasource. Any changes done to "Current" will be automatically graphed.
-p.line(x='Date',y='New Deaths',source=Current, legend_label="New Deaths",line_color="red")
-p.line(x='Date',y='Deaths/1M pop',source=Current, legend_label="Deaths/1M pop",line_color="orange")
-p.line(x='Date',y='New Deaths/1M pop',source=Current, legend_label="New Deaths/1M pop",line_color="purple")
-p.legend.location = "top_left"
-p.legend.click_policy="hide"
+p1 = figure(x_axis_label = 'Date', y_axis_label = 'Total Deaths',x_axis_type='datetime',) #Initialize the figure
+p1.line(x='Date',y='Total Deaths',source=Current, line_color="blue") #source=Current links the plot to the Current datasource. Any changes done to "Current" will be automatically graphed.
+p2 = figure(x_axis_label = 'Date', y_axis_label = 'New Deaths',x_axis_type='datetime',) #Initialize the figure
+p2.line(x='Date',y='New Deaths',source=Current, line_color="red")
+p3 = figure(x_axis_label = 'Date', y_axis_label = 'Deaths/1M pop',x_axis_type='datetime',) #Initialize the figure
+p3.line(x='Date',y='Deaths/1M pop',source=Current, line_color="orange")
+p4 = figure(x_axis_label = 'Date', y_axis_label = 'New Deaths/1M pop',x_axis_type='datetime',) #Initialize the figure
+p4.line(x='Date',y='New Deaths/1M pop',source=Current, line_color="purple")
+#p.legend.location = "top_left"
+#p.legend.click_policy="hide"
 #p.multi_line(xs = 'Date', ys = 'Total Deaths', source = Current)
-
+p = gridplot([[p1, p2],[p3, p4]])
 # TODO - change plot to be whatever we're actually using for this
 display_interactive = column(dropdown,dateslider,p)
 
