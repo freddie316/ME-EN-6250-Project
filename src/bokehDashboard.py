@@ -83,6 +83,7 @@ with open('country-list-WOM.txt') as country_list:
 
 # Pasted below is the code from bokehLinkedInputs to create an interactive image with dropdown box and date slider - inputs need to be modified to dataframe from this code
 df_overall = dfMaster
+df_overall['Date'] = pd.to_datetime(df_overall['Date'])
 df_overall = df_overall.sort_values(['Country','Date'], ascending=[True, True]) #Sorts the dataframe.
 
 df_current = df_overall[df_overall['Country']=='USA'] #Pulls out a column showing just the USA (default country plot)
@@ -154,7 +155,6 @@ for(var i = 0; i <= source.get_length(); i++){
 sc.change.emit();
 """
 # ---- Create a dataframe from the list
-df_overall['Date'] = pd.to_datetime(df_overall['Date'])
 valid_dates = {'start_date' : df_overall['Date'].min(), 'end_date' : df_overall['Date'].max()}
 print(valid_dates)
 valid_dates = pd.DataFrame(valid_dates, index=[0])
@@ -171,7 +171,7 @@ dropdown.js_on_change('value',update_dropdown) #Passes the dropdown value into t
 dateslider.js_on_change('value',update_date)
 
 p = figure(x_axis_label = 'Date', y_axis_label = 'Count',x_axis_type='datetime',) #Initialize the figure
-p.line(x='Date',y='Total Deaths',source=Current, legend_label="Total Deaths",line_color="blue") #source=Current links the plot to the Current datasource. Any changes done to "Current" will be automatically graphed.
+#p.line(x='Date',y='Total Deaths',source=Current, legend_label="Total Deaths",line_color="blue") #source=Current links the plot to the Current datasource. Any changes done to "Current" will be automatically graphed.
 p.line(x='Date',y='New Deaths',source=Current, legend_label="New Deaths",line_color="red")
 p.line(x='Date',y='Deaths/1M pop',source=Current, legend_label="Deaths/1M pop",line_color="orange")
 p.line(x='Date',y='New Deaths/1M pop',source=Current, legend_label="New Deaths/1M pop",line_color="purple")
