@@ -71,8 +71,8 @@ def scrape_country(country,site):
             dfPrev = pd.read_json(output) # check if JSON already exists
             for i in reversed(range(0,len(df))):
                 dataAlready = False
-                for j in dfPrev[country]:
-                    if df[country][i] == j:
+                for j in dfPrev['Date']:
+                    if df['Date'][i] == j:
                         dataAlready = True
                 if dataAlready == False:
                     dfPrev = pd.concat([df.loc[i].to_frame().T,dfPrev],ignore_index=True)
