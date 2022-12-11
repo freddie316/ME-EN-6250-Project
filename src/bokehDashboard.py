@@ -92,7 +92,82 @@ valid_dates = {'start_date' : date(2022,12,7), 'end_date' : date(2022,12,9)}
 valid_dates = pd.DataFrame(valid_dates, index=[0])
 
 daterange = ColumnDataSource(valid_dates) #Date range used for plotting. 
+
+
 # Pasted is the code from bokehLinkedInputs to create an interactive image with dropdown box and date slider - inputs need to be modified to dataframe from this code
+# ---- JavaScript Codes to be used
+alert_code = """
+//I used alerts to make sure that certain things were working. This can also be used to print variables within JavaScript
+alert('A change was made')
+"""
+
+dropdown_code = """
+// Code used to update the plot when the dropdown country changes.
+var start = daterange.data['start_date']
+var end = daterange.data['end_date']
+var f = cb_obj.value
+sc.data['Date'] = []
+sc.data['Deaths'] = []
+sc.data['Deaths per mill'] = []
+sc.data['Death Rate'] = []
+sc.data['Death Rate per mill'] = []
+sc.data['Country'] = []
+
+//Goes through the Overall datasource and adds to the Current datasource based on country and date selection
+for(var i = 0; i <= source.get_length(); i++){
+    if (source.data['Country'][i] == f && source.data['Date'][i]<=end && source.data['Date'][i]>=start){
+        sc.data['Date'].push(source.data['Date'][i]);
+        sc.data['Deaths'].push(source.data['Deaths'][i]);
+        sc.data['Deaths per mill'].push(source.data['Deaths per mill'][i]);
+        sc.data['Death Rate'].push(source.data['Death Rate'][i]);
+        sc.data['Death Rate per mill'].push(source.data['Death Rate per mill'][i]);
+        sc.data['Country'].push(source.data['Country'][i]);
+    }
+}
+
+sc.change.emit(); //Used to make sure the change actually goes through
+"""
+
+
+date_code = """
+//Code used to update the plot when the date slider changes. This also updates a daterange datasource so that the range is propogated to be used in dropdown_code
+var f = cb_obj.value
+daterange.data['start_date'] = f[0]
+daterange.data['end_date'] = f[1]
+daterange.change.emit();
+
+var start = daterange.data['start_date']
+var end = daterange.data['end_date']
+var country = sc.data['Country'][0]
+
+sc.data['Date'] = []
+sc.data['Deaths'] = []
+sc.data['Deaths per mill'] = []
+sc.data['Death Rate'] = []
+sc.data['Death Rate per mill'] = []
+
+for(var i = 0; i <= source.get_length(); i++){
+    if (source.data['Country'][i] == country && source.data['Date'][i]<=end && source.data['Date'][i]>=start){
+        sc.data['Date'].push(source.data['Date'][i]);
+        sc.data['Deaths'].push(source.data['Deaths'][i]);
+        sc.data['Deaths per mill'].push(source.data['Deaths per mill'][i]);
+        sc.data['Death Rate'].push(source.data['Death Rate'][i]);
+        sc.data['Death Rate per mill'].push(source.data['Death Rate per mill'][i]);
+    }
+}
+
+sc.change.emit();
+"""
+# ---- Create a dataframe from the list
+df_overall = pd.DataFrame(country_data)
+df_overall = df_overall.sort_values(['Country', 'Date'], ascending=[True, True]) #Sorts the dataframe.
+
+df_current = df_overall[df_overall['Country']=='USA'] #Pulls out a column showing just the USA
+
+
+Overall = ColumnDataSource(df_overall) #Puts the dataframe for all of the countries into a datasource useable by Javascript
+Current = ColumnDataSource(df_current) #Another DataSource that will be used for plotting
+
 update_dropdown = CustomJS(args = dict(source=Overall, sc=Current, daterange = daterange), code=dropdown_code) #Shows the Javascript code what to run when the dropdown is changed.
 update_date = CustomJS(args = dict(source=Overall, sc=Current, daterange = daterange), code = date_code)
 
