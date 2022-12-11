@@ -9,7 +9,7 @@
 # I'd recommend using conda instead of pip 
 # if you are using anaconda distribution 
 
-# ScrapeWebsiteV2.2.0
+# ScrapeWebsiteV2.4.0
 
 import os
 import requests
@@ -25,7 +25,7 @@ def scrape_country(country,site):
     # Country is the string of the country being queried. URL is the string of the site being scraped. MUST be worldometer OR XXXX
     
     # Set up data dictionary
-    data = {country:[], 'Total Deaths':[],
+    data = {'Country':[], 'Date':[], 'Total Deaths':[],
             'New Deaths':[], 'Deaths/1M pop':[],
             'New Deaths/1M pop':[]}
     
@@ -40,22 +40,29 @@ def scrape_country(country,site):
             table = soup.find('table', id = tableId) # search the correct table
             if day == 'today':
                 today = date.today().strftime("%m/%d/%y")
-                data[country].append(today) # append days to dict
+                data['Date'].append(today) # append days to dict
             elif day == 'yesterday':
                 yesterday = date.today() - timedelta(days = 1)
-                data[country].append(yesterday.strftime("%m/%d/%y"))
+                data['Date'].append(yesterday.strftime("%m/%d/%y"))
             else:
                 yesterday2 = date.today() - timedelta(days = 2)
-                data[country].append(yesterday2.strftime("%m/%d/%y"))
+                data['Date'].append(yesterday2.strftime("%m/%d/%y"))
             for row in table.tbody.find_all('tr'): # find all rows
                 # Find all data for each column
                 columns = row.find_all('td') # find all data entries
                 if columns != [] and columns[1].text.strip() == country:
                     # look for only relevant country, and append data to dict
-                    data['Total Deaths'].append(columns[4].text.strip())
-                    data['New Deaths'].append(columns[5].text.strip())
-                    data['Deaths/1M pop'].append(columns[11].text.strip())
-                    data['New Deaths/1M pop'].append(columns[20].text.strip())
+                    data['Country'].append(columns[1].text.strip())
+                    data['Total Deaths'].append(int(columns[4].text.strip().replace(',','')))
+                    try:
+                        data['New Deaths'].append(int(columns[5].text.strip()))
+                    except:
+                        data['New Deaths'].append(0)
+                    data['Deaths/1M pop'].append(int(columns[11].text.strip().replace(',','')))
+                    try:
+                        data['New Deaths/1M pop'].append(float(columns[20].text.strip()))
+                    except:
+                        data['New Deaths/1M pop'].append(0.0)
 
         # Convert dictionary into a dataframe
         df = pd.DataFrame.from_dict(data)
@@ -67,12 +74,14 @@ def scrape_country(country,site):
         output = os.path.join(output, 'output\\' + filename)
         
         try:
-            dfPrev = pd.read_json(output) # check if JSON already exists
+            dfPrev = pd.read_json(output,convert_dates=False) # check if JSON already exists
             for i in reversed(range(0,len(df))):
                 dataAlready = False
-                for j in dfPrev[country]:
-                    if df[country][i] == j:
+                for j in range(0,len(df)):
+                    if df['Date'][i] == dfPrev['Date'][j]:
                         dataAlready = True
+                        for key in dfPrev:
+                            dfPrev.loc[:, (key,j)] = df.loc[:,(key,j)]
                 if dataAlready == False:
                     dfPrev = pd.concat([df.loc[i].to_frame().T,dfPrev],ignore_index=True)
             dfPrev.to_json(output)
@@ -137,10 +146,11 @@ def scrape_country(country,site):
         table = soup.find('div', role = 'rowgroup')
         rows = table.find_all('div', role = 'row')
         today = date.today().strftime("%m/%d/%y")
-        data[country].append(today) # append days to dict
+        data['Date'].append(today) # append days to dict
         for row in rows:
             cells = row.find_all('div',role = 'cell')
             if cells[0].text.strip() != [] and cells[0].text.strip() == country:
+                data['Country'].append(cells[0].text.strip())
                 data['Total Deaths'].append(cells[1].text.strip())
                 data['New Deaths'].append(cells[3].text.strip())
                 data['Deaths/1M pop'].append(float(cells[2].text.strip())*10)
@@ -155,7 +165,7 @@ def scrape_country(country,site):
         filename = country + '-WHO.json'
         output = os.path.join(output, 'output\\' + filename)
         try:
-            dfPrev = pd.read_json(output)
+            dfPrev = pd.read_json(output,convert_dates=False)
             dataAlready = False
             for i in dfPrev[country]:
                 if date.today().strftime("%m/%d/%y") == i:
