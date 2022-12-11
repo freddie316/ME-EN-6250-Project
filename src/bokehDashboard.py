@@ -25,7 +25,9 @@ output = output_file(outputPath)
 # Scraping data from WorldOMeter
 site = 'WorldOMeter'
 
+# Function for populating the data frames
 def populate_dataframes(continents):
+    globals()['dfMaster'] = pd.DataFrame()
     for key in continents:
         globals()['df'+key] = pd.DataFrame()
         for country in continents[key]:
@@ -33,8 +35,12 @@ def populate_dataframes(continents):
                 globals()['df'+key] = scrape_country(country,site)
             else:
                 df = scrape_country(country,site)
-                globals()['df'+key] = pd.concat([df,globals()['df'+key]])
-
+                globals()['df'+key] = pd.concat([df,globals()['df'+key]],ignore_index=True)
+        if globals()['dfMaster'].empty == True:
+            globals()['dfMaster'] = globals()['df'+key]
+        else:
+            globals()['dfMaster'] = pd.concat([globals()['dfMaster'],globals()['df'+key]],ignore_index=True)
+    
 continents = {'Europe':['Russia','Germany','UK'],
 'NAmerica':['USA','Mexico','Canada'],
 'Asia':['China','India','Indonesia'],
@@ -43,6 +49,8 @@ continents = {'Europe':['Russia','Germany','UK'],
 'Oceania':['Australia','Papua New Guinea','New Zealand']}
 
 populate_dataframes(continents)
+# note, IDE marks variables created inside the function as undefined
+# yet, the variables WILL be defined once the function runs.
 
 # TODO - The plot is used in every section, change so each display has its own figures
 plot = figure(title = "Sine Wave example", x_axis_label='x', y_axis_label='y')
