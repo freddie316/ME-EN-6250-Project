@@ -237,13 +237,13 @@ dateslider = DateRangeSlider(title = 'Time Range', start = valid_dates['start_da
 dropdown.js_on_change('value',update_dropdown) #Passes the dropdown value into the update_dropdown function handle
 dateslider.js_on_change('value',update_date)
 
-p1 = figure(x_axis_label = 'Date', y_axis_label = 'Total Deaths',x_axis_type='datetime',) #Initialize the figure
+p1 = figure(title = "Total Deaths", x_axis_label = 'Date', y_axis_label = 'Total Deaths',x_axis_type='datetime',) #Initialize the figure
 p1.line(x='Date',y='Total Deaths',source=Current, line_color="blue") #source=Current links the plot to the Current datasource. Any changes done to "Current" will be automatically graphed.
-p2 = figure(x_axis_label = 'Date', y_axis_label = 'New Deaths',x_axis_type='datetime',) #Initialize the figure
+p2 = figure(title = "New Deaths", x_axis_label = 'Date', y_axis_label = 'New Deaths',x_axis_type='datetime',) #Initialize the figure
 p2.line(x='Date',y='New Deaths',source=Current, line_color="red")
-p3 = figure(x_axis_label = 'Date', y_axis_label = 'Deaths/1M pop',x_axis_type='datetime',) #Initialize the figure
+p3 = figure(title = "Deaths per Million people", x_axis_label = 'Date', y_axis_label = 'Deaths/1M pop',x_axis_type='datetime',) #Initialize the figure
 p3.line(x='Date',y='Deaths/1M pop',source=Current, line_color="orange")
-p4 = figure(x_axis_label = 'Date', y_axis_label = 'New Deaths/1M pop',x_axis_type='datetime',) #Initialize the figure
+p4 = figure(title = "New Deaths per Million people", x_axis_label = 'Date', y_axis_label = 'New Deaths/1M pop',x_axis_type='datetime',) #Initialize the figure
 p4.line(x='Date',y='New Deaths/1M pop',source=Current, line_color="purple")
 #p.legend.location = "top_left"
 #p.legend.click_policy="hide"
