@@ -87,3 +87,27 @@ display_interactive = row(interactive_widgets,plot)
 layout = column(row(display_big,display_zoomed),display_interactive)
 #layout = gridplot([[display_big, display_zoomed],[display_interactive, None]])  # creating the layout
 show(layout)  # displaying the layout
+
+valid_dates = {'start_date' : date(2022,12,7), 'end_date' : date(2022,12,9)}
+valid_dates = pd.DataFrame(valid_dates, index=[0])
+
+daterange = ColumnDataSource(valid_dates) #Date range used for plotting. 
+# Pasted is the code from bokehLinkedInputs to create an interactive image with dropdown box and date slider - inputs need to be modified to dataframe from this code
+update_dropdown = CustomJS(args = dict(source=Overall, sc=Current, daterange = daterange), code=dropdown_code) #Shows the Javascript code what to run when the dropdown is changed.
+update_date = CustomJS(args = dict(source=Overall, sc=Current, daterange = daterange), code = date_code)
+
+dropdown = Select(options = ['USA','India'], title = 'Choose Country', value = 'USA') #Initializes the dropdown with USA selected
+dateslider = DateRangeSlider(title = 'Time Range', start = date(2022,12,7), end = date(2022,12,9), value =(date(2022,12,7),date(2022,12,9)), step=1) #Initializes the date slider
+
+dropdown.js_on_change('value',update_dropdown) #Passes the dropdown value into the update_dropdown function handle
+dateslider.js_on_change('value',update_date)
+
+p = figure(x_axis_label = 'Date', y_axis_label = 'Count',x_axis_type='datetime',) #Initialize the figure
+p.line(x='Date',y='Deaths',source=Current, legend_label="Deaths",line_color="blue") #source=Current links the plot to the Current datasource. Any changes done to "Current" will be automatically graphed.
+p.line(x='Date',y='Death Rate',source=Current, legend_label="Death Rate",line_color="red")
+p.line(x='Date',y='Deaths per mill',source=Current, legend_label="Deaths per mill",line_color="orange")
+p.line(x='Date',y='Death Rate per mill',source=Current, legend_label="Death Rate per mill",line_color="purple")
+p.legend.location = "top_left"
+p.legend.click_policy="hide"
+#p.multi_line(xs = 'Date', ys = 'Deaths', source = Current)
+show(column(dropdown,dateslider,p)) #Creates the bokeh image
