@@ -75,26 +75,16 @@ with open('country-list-WOM.txt') as country_list:
     valid_countries = data.split('\n')
 
 # TODO - add JS functions to each of these widgets
-interactive_countries = AutocompleteInput(title="Enter a Country:", completions=valid_countries)
-interactive_dates = DateRangeSlider(value=(date(2022, 12, 6), date(2022, 12, 8)),
-                                    start=date(2022, 12, 6), end=date(2022, 12, 8))
-interactive_stats = CheckboxGroup(labels = ['Deaths','Death Rate','Deaths per Million', 'Death rate per Million'], active = [0,1])
-interactive_widgets = column(interactive_countries, interactive_dates, interactive_stats)
-# TODO - change plot to be whatever we're actually using for this
-display_interactive = row(interactive_widgets,plot)
 
-## This section puts them together
-layout = column(row(display_big,display_zoomed),display_interactive)
-#layout = gridplot([[display_big, display_zoomed],[display_interactive, None]])  # creating the layout
-show(layout)  # displaying the layout
+# Pasted below is the code from bokehLinkedInputs to create an interactive image with dropdown box and date slider - inputs need to be modified to dataframe from this code
+df_overall = dfMaster
+df_overall = df_overall.sort_values(['Country', 'Date'], ascending=[True, True]) #Sorts the dataframe.
 
-valid_dates = {'start_date' : date(2022,12,7), 'end_date' : date(2022,12,9)}
-valid_dates = pd.DataFrame(valid_dates, index=[0])
+df_current = df_overall[df_overall['Country']=='USA'] #Pulls out a column showing just the USA
 
-daterange = ColumnDataSource(valid_dates) #Date range used for plotting. 
+Overall = ColumnDataSource(df_overall) #Puts the dataframe for all of the countries into a datasource useable by Javascript
+Current = ColumnDataSource(df_current) #Another DataSource that will be used for plotting
 
-
-# Pasted is the code from bokehLinkedInputs to create an interactive image with dropdown box and date slider - inputs need to be modified to dataframe from this code
 # ---- JavaScript Codes to be used
 alert_code = """
 //I used alerts to make sure that certain things were working. This can also be used to print variables within JavaScript
@@ -159,14 +149,11 @@ for(var i = 0; i <= source.get_length(); i++){
 sc.change.emit();
 """
 # ---- Create a dataframe from the list
-df_overall = pd.DataFrame(country_data)
-df_overall = df_overall.sort_values(['Country', 'Date'], ascending=[True, True]) #Sorts the dataframe.
 
-df_current = df_overall[df_overall['Country']=='USA'] #Pulls out a column showing just the USA
+valid_dates = {'start_date' : date(2022,12,7), 'end_date' : date(2022,12,9)}
+valid_dates = pd.DataFrame(valid_dates, index=[0])
 
-
-Overall = ColumnDataSource(df_overall) #Puts the dataframe for all of the countries into a datasource useable by Javascript
-Current = ColumnDataSource(df_current) #Another DataSource that will be used for plotting
+daterange = ColumnDataSource(valid_dates) #Date range used for plotting. 
 
 update_dropdown = CustomJS(args = dict(source=Overall, sc=Current, daterange = daterange), code=dropdown_code) #Shows the Javascript code what to run when the dropdown is changed.
 update_date = CustomJS(args = dict(source=Overall, sc=Current, daterange = daterange), code = date_code)
@@ -185,4 +172,11 @@ p.line(x='Date',y='Death Rate per mill',source=Current, legend_label="Death Rate
 p.legend.location = "top_left"
 p.legend.click_policy="hide"
 #p.multi_line(xs = 'Date', ys = 'Deaths', source = Current)
-show(column(dropdown,dateslider,p)) #Creates the bokeh image
+
+# TODO - change plot to be whatever we're actually using for this
+display_interactive = column(dropdown,dateslider,p)
+
+## This section puts them together
+layout = column(row(display_big,display_zoomed),display_interactive)
+#layout = gridplot([[display_big, display_zoomed],[display_interactive, None]])  # creating the layout
+show(layout)  # displaying the layout
