@@ -19,7 +19,7 @@ from bs4 import BeautifulSoup
 from pathlib import Path
 from selenium import webdriver
 from webdriver_manager.chrome import ChromeDriverManager
-from datetime import date, timedelta
+from datetime import date, timedelta,datetime
 
 def scrape_country(country,site):
     # Country is the string of the country being queried. URL is the string of the site being scraped. MUST be worldometer OR XXXX
@@ -68,7 +68,7 @@ def scrape_country(country,site):
         output = os.path.join(output, 'output\\' + filename)
         
         try:
-            dfPrev = pd.read_json(output) # check if JSON already exists
+            dfPrev = pd.read_json(output,convert_dates=False) # check if JSON already exists
             for i in reversed(range(0,len(df))):
                 dataAlready = False
                 for j in dfPrev['Date']:
@@ -157,7 +157,7 @@ def scrape_country(country,site):
         filename = country + '-WHO.json'
         output = os.path.join(output, 'output\\' + filename)
         try:
-            dfPrev = pd.read_json(output)
+            dfPrev = pd.read_json(output,convert_dates=False)
             dataAlready = False
             for i in dfPrev[country]:
                 if date.today().strftime("%m/%d/%y") == i:
@@ -171,8 +171,8 @@ def scrape_country(country,site):
         return None
     
 # =============================================================================
-# USAData = scrape_country('USA','WorldOMeter')
-# print(USAData)
+USAData = scrape_country('USA','WorldOMeter')
+print(USAData)
 # UKData = scrape_country('UK','WorldOMeter')
 # print(UKData)
 # ChinaData = scrape_country('China','WorldOMeter')
