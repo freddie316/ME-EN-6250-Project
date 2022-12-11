@@ -48,6 +48,11 @@ continents = {'Europe':['Russia','Germany','UK'],
 'Africa':['Nigeria','Ethiopia','Egypt'],
 'Oceania':['Australia','Papua New Guinea','New Zealand']}
 
+countries = []
+for i in continents.keys():
+    for j in continents[i]:
+        countries.append(j)
+
 populate_dataframes(continents)
 # note, IDE marks variables created inside the function as undefined
 # yet, the variables WILL be defined once the function runs.
@@ -78,7 +83,7 @@ with open('country-list-WOM.txt') as country_list:
 
 # Pasted below is the code from bokehLinkedInputs to create an interactive image with dropdown box and date slider - inputs need to be modified to dataframe from this code
 df_overall = dfMaster
-df_overall = df_overall.sort_values(['Country', 'Date'], ascending=[True, True]) #Sorts the dataframe.
+df_overall = df_overall.sort_values(countries, ascending=[True, True]) #Sorts the dataframe.
 
 df_current = df_overall[df_overall['Country']=='USA'] #Pulls out a column showing just the USA
 
