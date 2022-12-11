@@ -1,25 +1,56 @@
 #output_file-to save the layout in file, show-display the layout , output_notebook-to configure the default output state  to generate the output in jupytor notebook.
 #from bokeh.io import output_file, show, output_notebook
 #ColumnDataSource makes selection of the column easier and Select is used to create drop down
-from bokeh.models import ColumnDataSource, Select
+# from bokeh.models import ColumnDataSource, Select
 #Figure objects have many glyph methods that can be used to draw vectorized graphical glyphs. example of glyphs-circle, line, scattter etc.
-from bokeh.plotting import figure
+# from bokeh.plotting import figure
 #To create intractive plot we need this to add callback method.
-from bokeh.models import CustomJS
+# from bokeh.models import CustomJS
 #This is for creating layout
-from bokeh.layouts import column, row, gridplot
-from bokeh.models import CustomJS, Dropdown, AutocompleteInput, DateRangeSlider, CheckboxGroup
-from bokeh.plotting import figure, output_file, show
-import numpy as np
-from datetime import date
 import os
+import numpy as np
+import pandas as pd
+from datetime import date
 from pathlib import Path
+from ScrapeWebsite import scrape_country
+from bokeh.layouts import column, row, gridplot
+from bokeh.models import CustomJS, Dropdown, AutocompleteInput, DateRangeSlider, CheckboxGroup, ColumnDataSource, Select
+from bokeh.plotting import figure, output_file, show
 
 outputPath = Path(os.getcwd())
 outputPath = outputPath.parent.absolute()
 outputPath = os.path.join(outputPath, 'output\\covid-dashboard.html')
 output = output_file(outputPath)
 
+# Scraping data from WorldOMeter
+site = 'WorldOMeter'
+
+# Function for populating the data frames
+def populate_dataframes(continents):
+    globals()['dfMaster'] = pd.DataFrame()
+    for key in continents:
+        globals()['df'+key] = pd.DataFrame()
+        for country in continents[key]:
+            if globals()['df'+key].empty == True:
+                globals()['df'+key] = scrape_country(country,site)
+            else:
+                df = scrape_country(country,site)
+                globals()['df'+key] = pd.concat([df,globals()['df'+key]],ignore_index=True)
+        if globals()['dfMaster'].empty == True:
+            globals()['dfMaster'] = globals()['df'+key]
+        else:
+            globals()['dfMaster'] = pd.concat([globals()['dfMaster'],globals()['df'+key]],ignore_index=True)
+    
+continents = {'Europe':['Russia','Germany','UK'],
+'NAmerica':['USA','Mexico','Canada'],
+'Asia':['China','India','Indonesia'],
+'SAmerica':['Brazil','Colombia','Argentina'],
+'Africa':['Nigeria','Ethiopia','Egypt'],
+'Oceania':['Australia','Papua New Guinea','New Zealand']}
+
+populate_dataframes(continents)
+# note, IDE marks variables created inside the function as undefined
+# yet, the variables WILL be defined once the function runs.
 
 # TODO - The plot is used in every section, change so each display has its own figures
 plot = figure(title = "Sine Wave example", x_axis_label='x', y_axis_label='y')
