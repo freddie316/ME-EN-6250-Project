@@ -99,10 +99,10 @@ zoomed_table = DataTable(source=current_continent, columns = columns)
 
 
 # TODO - The plot is used in every section, change so each display has its own figures
-plot = figure(title = "Sine Wave example", x_axis_label='x', y_axis_label='y')
-x = np.linspace(0,2*np.pi,1000)
-y = np.sin(x)
-plot.line(x,y)
+plot = figure(title = "Big Picture Deaths per Million People Today", x_axis_label='Country', y_axis_label='Count', x_range = df_overall[df_overall['Country']==df_overall['Country'].max()]['Deaths/1M pop'])
+x = countries
+y = df_overall[df_overall['Date']==df_overall['Date'].max()]['Deaths/1M pop']
+plot.vbar(x,y)
 # TODO - create the big display plot
 display_big = plot
 
@@ -223,7 +223,6 @@ sc.change.emit();
 """
 # ---- Create a dataframe from the list
 valid_dates = {'start_date' : df_overall['Date'].min(), 'end_date' : df_overall['Date'].max()}
-print(valid_dates)
 valid_dates = pd.DataFrame(valid_dates, index=[0])
 
 daterange = ColumnDataSource(valid_dates) #Date range used for plotting. 
