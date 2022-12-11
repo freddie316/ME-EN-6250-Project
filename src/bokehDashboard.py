@@ -56,6 +56,17 @@ for i in continents.keys():
 populate_dataframes(continents)
 # note, IDE marks variables created inside the function as undefined
 # yet, the variables WILL be defined once the function runs.
+df_overall = dfMaster
+df_overall = df_overall.sort_values(['Country','Date'], ascending=[True, True]) #Sorts the dataframe.
+
+NAmerica = ColumnDataSource(dfNAmerica)
+Asia = ColumnDataSource(dfAsia)
+SAmerica = ColumnDataSource(dfSAmerica)
+Africa = ColumnDataSource(dfAfrica)
+Oceania = ColumnDataSource(dfOceania)
+
+zoom_fig = figure(title = 'Stats by Continent', )
+
 
 # TODO - The plot is used in every section, change so each display has its own figures
 plot = figure(title = "Sine Wave example", x_axis_label='x', y_axis_label='y')
@@ -82,8 +93,7 @@ with open('country-list-WOM.txt') as country_list:
 # TODO - add JS functions to each of these widgets
 
 # Pasted below is the code from bokehLinkedInputs to create an interactive image with dropdown box and date slider - inputs need to be modified to dataframe from this code
-df_overall = dfMaster
-df_overall = df_overall.sort_values(['Country','Date'], ascending=[True, True]) #Sorts the dataframe.
+
 
 df_current = df_overall[df_overall['Country']=='USA'] #Pulls out a column showing just the USA (default country plot)
 

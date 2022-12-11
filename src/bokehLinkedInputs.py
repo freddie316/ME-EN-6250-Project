@@ -14,12 +14,12 @@ import warnings
 
 # --- This is just a filler to create a dictionary. We will want to use the actual JSON file.
 country_data = []
-country_data.append({'Country':'USA','Date':date(2022,12,7),'Deaths':100000,'Deaths per mill':10,'Death Rate':5,'Death Rate per mill':1})
-country_data.append({'Country':'USA','Date':date(2022,12,8),'Deaths':1000,'Deaths per mill':8,'Death Rate':3,'Death Rate per mill':2})
-country_data.append({'Country':'USA','Date':date(2022,12,9),'Deaths':500,'Deaths per mill':6,'Death Rate':8,'Death Rate per mill':4})
-country_data.append({'Country':'India','Date':date(2022,12,7),'Deaths':500,'Deaths per mill':6,'Death Rate':8,'Death Rate per mill':4})
-country_data.append({'Country':'India','Date':date(2022,12,8),'Deaths':1000,'Deaths per mill':8,'Death Rate':3,'Death Rate per mill':2})
-country_data.append({'Country':'India','Date':date(2022,12,9),'Deaths':100000,'Deaths per mill':10,'Death Rate':5,'Death Rate per mill':1})
+country_data.append({'Country':'USA','Date':date(2022,12,7),'Total Deaths':100000,'Deaths/1M pop':10,'New Deaths':5,'New Deaths/1M pop':1})
+country_data.append({'Country':'USA','Date':date(2022,12,8),'Total Deaths':1000,'Deaths/1M pop':8,'New Deaths':3,'New Deaths/1M pop':2})
+country_data.append({'Country':'USA','Date':date(2022,12,9),'Total Deaths':500,'Deaths/1M pop':6,'New Deaths':8,'New Deaths/1M pop':4})
+country_data.append({'Country':'India','Date':date(2022,12,7),'Total Deaths':500,'Deaths/1M pop':6,'New Deaths':8,'New Deaths/1M pop':4})
+country_data.append({'Country':'India','Date':date(2022,12,8),'Total Deaths':1000,'Deaths/1M pop':8,'New Deaths':3,'New Deaths/1M pop':2})
+country_data.append({'Country':'India','Date':date(2022,12,9),'Total Deaths':100000,'Deaths/1M pop':10,'New Deaths':5,'New Deaths/1M pop':1})
 
 # ---- Create a dataframe from the list
 df_overall = pd.DataFrame(country_data)
@@ -43,20 +43,20 @@ var start = daterange.data['start_date']
 var end = daterange.data['end_date']
 var f = cb_obj.value
 sc.data['Date'] = []
-sc.data['Deaths'] = []
-sc.data['Deaths per mill'] = []
-sc.data['Death Rate'] = []
-sc.data['Death Rate per mill'] = []
+sc.data['Total Deaths'] = []
+sc.data['Deaths/1M pop'] = []
+sc.data['New Deaths'] = []
+sc.data['New Deaths/1M pop'] = []
 sc.data['Country'] = []
 
 //Goes through the Overall datasource and adds to the Current datasource based on country and date selection
 for(var i = 0; i <= source.get_length(); i++){
     if (source.data['Country'][i] == f && source.data['Date'][i]<=end && source.data['Date'][i]>=start){
         sc.data['Date'].push(source.data['Date'][i]);
-        sc.data['Deaths'].push(source.data['Deaths'][i]);
-        sc.data['Deaths per mill'].push(source.data['Deaths per mill'][i]);
-        sc.data['Death Rate'].push(source.data['Death Rate'][i]);
-        sc.data['Death Rate per mill'].push(source.data['Death Rate per mill'][i]);
+        sc.data['Total Deaths'].push(source.data['Total Deaths'][i]);
+        sc.data['Deaths/1M pop'].push(source.data['Deaths/1M pop'][i]);
+        sc.data['New Deaths'].push(source.data['New Deaths'][i]);
+        sc.data['New Deaths/1M pop'].push(source.data['New Deaths/1M pop'][i]);
         sc.data['Country'].push(source.data['Country'][i]);
     }
 }
@@ -77,18 +77,18 @@ var end = daterange.data['end_date']
 var country = sc.data['Country'][0]
 
 sc.data['Date'] = []
-sc.data['Deaths'] = []
-sc.data['Deaths per mill'] = []
-sc.data['Death Rate'] = []
-sc.data['Death Rate per mill'] = []
+sc.data['Total Deaths'] = []
+sc.data['Deaths/1M pop'] = []
+sc.data['New Deaths'] = []
+sc.data['New Deaths/1M pop'] = []
 
 for(var i = 0; i <= source.get_length(); i++){
     if (source.data['Country'][i] == country && source.data['Date'][i]<=end && source.data['Date'][i]>=start){
         sc.data['Date'].push(source.data['Date'][i]);
-        sc.data['Deaths'].push(source.data['Deaths'][i]);
-        sc.data['Deaths per mill'].push(source.data['Deaths per mill'][i]);
-        sc.data['Death Rate'].push(source.data['Death Rate'][i]);
-        sc.data['Death Rate per mill'].push(source.data['Death Rate per mill'][i]);
+        sc.data['Total Deaths'].push(source.data['Total Deaths'][i]);
+        sc.data['Deaths/1M pop'].push(source.data['Deaths/1M pop'][i]);
+        sc.data['New Deaths'].push(source.data['New Deaths'][i]);
+        sc.data['New Deaths/1M pop'].push(source.data['New Deaths/1M pop'][i]);
     }
 }
 
@@ -111,12 +111,12 @@ dropdown.js_on_change('value',update_dropdown) #Passes the dropdown value into t
 dateslider.js_on_change('value',update_date)
 
 p = figure(x_axis_label = 'Date', y_axis_label = 'Count',x_axis_type='datetime',) #Initialize the figure
-p.line(x='Date',y='Deaths',source=Current, legend_label="Deaths",line_color="blue") #source=Current links the plot to the Current datasource. Any changes done to "Current" will be automatically graphed.
-p.line(x='Date',y='Death Rate',source=Current, legend_label="Death Rate",line_color="red")
-p.line(x='Date',y='Deaths per mill',source=Current, legend_label="Deaths per mill",line_color="orange")
-p.line(x='Date',y='Death Rate per mill',source=Current, legend_label="Death Rate per mill",line_color="purple")
+#p.line(x='Date',y='Total Deaths',source=Current, legend_label="Deaths",line_color="blue") #source=Current links the plot to the Current datasource. Any changes done to "Current" will be automatically graphed.
+p.line(x='Date',y='New Deaths',source=Current, legend_label="Death Rate",line_color="red")
+p.line(x='Date',y='Deaths/1M pop',source=Current, legend_label="Deaths per mill",line_color="orange")
+p.line(x='Date',y='New Deaths/1M pop',source=Current, legend_label="Death Rate per mill",line_color="purple")
 p.legend.location = "top_left"
 p.legend.click_policy="hide"
-#p.multi_line(xs = 'Date', ys = 'Deaths', source = Current)
+#p.multi_line(xs = 'Date', ys = 'Total Deaths', source = Current)
 show(column(dropdown,dateslider,p)) #Creates the bokeh image
 
