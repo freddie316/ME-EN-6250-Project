@@ -9,7 +9,7 @@
 # I'd recommend using conda instead of pip 
 # if you are using anaconda distribution 
 
-# ScrapeWebsiteV2.3.0
+# ScrapeWebsiteV2.4.0
 
 import os
 import requests
@@ -53,10 +53,16 @@ def scrape_country(country,site):
                 if columns != [] and columns[1].text.strip() == country:
                     # look for only relevant country, and append data to dict
                     data['Country'].append(columns[1].text.strip())
-                    data['Total Deaths'].append(columns[4].text.strip())
-                    data['New Deaths'].append(columns[5].text.strip())
-                    data['Deaths/1M pop'].append(columns[11].text.strip())
-                    data['New Deaths/1M pop'].append(columns[20].text.strip())
+                    data['Total Deaths'].append(int(columns[4].text.strip().replace(',','')))
+                    try:
+                        data['New Deaths'].append(int(columns[5].text.strip()))
+                    except:
+                        data['New Deaths'].append(0)
+                    data['Deaths/1M pop'].append(int(columns[11].text.strip().replace(',','')))
+                    try:
+                        data['New Deaths/1M pop'].append(float(columns[20].text.strip()))
+                    except:
+                        data['New Deaths/1M pop'].append(0.0)
 
         # Convert dictionary into a dataframe
         df = pd.DataFrame.from_dict(data)
@@ -75,7 +81,7 @@ def scrape_country(country,site):
                     if df['Date'][i] == dfPrev['Date'][j]:
                         dataAlready = True
                         for key in dfPrev:
-                            dfPrev[key][j] = df[key][i]
+                            dfPrev.loc[:, (key,j)] = df.loc[:,(key,j)]
                 if dataAlready == False:
                     dfPrev = pd.concat([df.loc[i].to_frame().T,dfPrev],ignore_index=True)
             dfPrev.to_json(output)
@@ -173,8 +179,8 @@ def scrape_country(country,site):
         return None
     
 # =============================================================================
-# USAData = scrape_country('USA','WorldOMeter')
-# print(USAData)
+USAData = scrape_country('USA','WorldOMeter')
+print(USAData)
 # UKData = scrape_country('UK','WorldOMeter')
 # print(UKData)
 # ChinaData = scrape_country('China','WorldOMeter')
