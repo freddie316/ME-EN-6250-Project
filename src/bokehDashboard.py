@@ -60,7 +60,7 @@ df_overall = dfMaster
 df_overall['Date'] = pd.to_datetime(df_overall['Date'])
 df_overall = df_overall.sort_values(['Country','Date'], ascending=[True, True]) #Sorts the dataframe.
 
-df_current = df_overall[df_overall['Country']=='USA'] #Pulls out a column showing just the USA (default country plot)
+df_current = df_overall[df_overall['Country'] =='USA'] #Pulls out a column showing just the USA (default country plot)
 
 Overall = ColumnDataSource(df_overall) #Puts the dataframe for all of the countries into a datasource useable by Javascript
 Current = ColumnDataSource(df_current) #Another DataSource that will be used for plotting
@@ -112,40 +112,40 @@ with open('continent-list.txt') as continent_list:
     valid_continents = data.split('\n')
 
 # TODO - add functionality to Dropdown menu to update plots
-zoomed_continents = Dropdown(label = "Continent Select", menu = valid_continents)
+zoomed_continents = Select(title = "Continent Select", options = valid_continents, value = 'North America')
 
 
 continent_code = """
 var continent = cb_obj.value
-alert(continent)
+alert(continent);
 switch(continent) {
     case 'Africa':
-        curr.data = Africa.data
+        curr.data = Africa.data;
         break;
     case 'Asia':
-        curr.data = NAmerica.data
+        curr.data = Asia.data;
         break;
     case 'Europe':
-        curr.data = Europe.data
+        curr.data = Europe.data;
         break;
     case 'North America':
-        curr.data = NAmerica.data
+        curr.data = NAmerica.data;
         break;
     case 'South America':
-        curr.data = SAmerica.data
+        curr.data = SAmerica.data;
         break;
     case 'Oceania':
-        curr.data = Oceania.data
+        curr.data = Oceania.data;
         break;
     default:
-        curr.data = curr.data  
+        curr.data = curr.data;  
 }
 
 curr.change.emit();
 """
 
-continent_select = CustomJS(args = dict(curr=current_continent, NAmerica=NAmerica, Asia = Asia,SAmerica=SAmerica,Africa=Africa,Oceania=Oceania), code = continent_code)
-#zoomed_continents.js_on_change('value', continent_select)
+continent_select = CustomJS(args = dict(curr=current_continent, NAmerica=NAmerica, Asia = Asia,SAmerica=SAmerica,Africa=Africa,Oceania=Oceania, Europe=Europe), code = continent_code)
+zoomed_continents.js_on_change('value', continent_select)
 
 display_zoomed = column(zoomed_continents, zoomed_table)
 
